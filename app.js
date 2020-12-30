@@ -4,13 +4,14 @@ const path = require("path");
 const fs = require("fs");
 const app = express();
 const exec = require("child_process").exec;
+const crypto = require("crypto");
 
 const basePath = "/home/pi/root/";
-const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
 const port = 5555;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use();
 
 app.get("/", (req, res) => {
   res.sendStatus(500);
@@ -21,16 +22,48 @@ app.get("/github-push-webhook", (req, res) => {
   res.sendStatus(200);
   res.end();
 });
-app.post("/github-push-webhook", (req, res) => {
+
+app.post("/github-push-webhook", verifySignature, handlePush);
+
+app.listen(port, () => {
+  console.log(`[Pi-CD] listening on ${port}`);
+});
+
+const execCallback = (err, stdout, stderr) => {
+  if (stdout) console.log(stdout);
+  if (stderr) console.error(stderr);
+  if (err) console.error(err);
+};
+
+const createSignature = (body) => {
+  const hmac = crypto.createHmac("sha1", process.env.GITHUB_WEBHOOK_SECRET);
+  const signature = hmac.update(JSON.stringify(body)).digest("hex");
+  return `sha1=${signature}`;
+};
+
+const compareSignature = (remoteSignature, localSignature) => {
+  const remote = Buffer.from(remoteSignature);
+  const local = Buffer.from(localSignature);
+  return crypto.timingSafeEqual(remote, local);
+};
+
+const verifySignature = (req, res, next) => {
+  const { headers, body } = req;
+
+  const remoteSignature = headers["x-hub-signature"];
+  if (
+    remoteSignature &&
+    !compareSignature(remoteSignature, createSignature(body))
+  ) {
+    return res.status(401).send("Signature mismatch! Get fucked loser!");
+  }
+  next();
+};
+
+const handlePush = (req, res) => {
   console.log(
     `${req.body.sender.login} updated ${req.body.repository.full_name}`
   );
-
-  console.log(req.body.hook.config.secret);
-  if (req.body.hook.config.secret !== webhookSecret) {
-    res.sendStatus(401);
-    return res.end();
-  }
 
   const projectPath = path.join(basePath, req.body.repository.name);
   fs.access(projectPath, fs.constants.F_OK, (err) => {
@@ -52,14 +85,4 @@ app.post("/github-push-webhook", (req, res) => {
     res.sendStatus(200);
     res.end();
   });
-});
-
-app.listen(port, () => {
-  console.log(`[Pi-CD] listening on ${port}`);
-});
-
-const execCallback = (err, stdout, stderr) => {
-  if (stdout) console.log(stdout);
-  if (stderr) console.error(stderr);
-  if (err) console.error(err);
 };
