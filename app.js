@@ -9,11 +9,11 @@ const crypto = require("crypto");
 const basePath = "/home/pi/root/";
 const port = 5555;
 
-
-const execCallback = (err, stdout, stderr) => {
+const execCallback = (err, stdout, stderr, next) => {
   if (stdout) console.log(stdout);
   if (stderr) console.error(stderr);
   if (err) console.error(err);
+  if (next && typeof next === "function") next();
 };
 
 const createSignature = (body) => {
@@ -55,13 +55,22 @@ const handlePush = (req, res) => {
     }
 
     // reset local changes if any
-    exec(`git -C ${projectPath} reset --hard`, execCallback);
-    // ditch local files if any
-    exec(`git -C ${projectPath} clean -df`, execCallback);
-    // pull latest
-    exec(`git -C ${projectPath} pull -f`, execCallback);
-    // restart process
-    exec(`pm2 restart ${req.body.repository.name}`, execCallback);
+    exec(`git -C ${projectPath} reset --hard`, (err, stdout, stderr) =>
+      execCallback(err, stdout, stderr, () => {
+        // ditch local files if any
+        exec(`git -C ${projectPath} clean -df`, (err, stdout, stderr) =>
+          execCallback(err, stdout, stderr, () => {
+            // pull latest
+            exec(`git -C ${projectPath} pull -f`, (err, stdout, stderr) =>
+              execCallback(err, stdout, stderr, () => {
+                // restart process
+                exec(`pm2 restart ${req.body.repository.name}`, execCallback);
+              })
+            );
+          })
+        );
+      })
+    );
 
     res.sendStatus(200);
     res.end();
