@@ -9,24 +9,6 @@ const crypto = require("crypto");
 const basePath = "/home/pi/root/";
 const port = 5555;
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.get("/", (req, res) => {
-  res.sendStatus(500);
-  res.end();
-});
-
-app.get("/github-push-webhook", (req, res) => {
-  res.sendStatus(200);
-  res.end();
-});
-
-app.post("/github-push-webhook", verifySignature, handlePush);
-
-app.listen(port, () => {
-  console.log(`[Pi-CD] listening on ${port}`);
-});
 
 const execCallback = (err, stdout, stderr) => {
   if (stdout) console.log(stdout);
@@ -85,3 +67,22 @@ const handlePush = (req, res) => {
     res.end();
   });
 };
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.get("/", (req, res) => {
+  res.sendStatus(500);
+  res.end();
+});
+
+app.get("/github-push-webhook", (req, res) => {
+  res.sendStatus(200);
+  res.end();
+});
+
+app.post("/github-push-webhook", verifySignature, handlePush);
+
+app.listen(port, () => {
+  console.log(`[Pi-CD] listening on ${port}`);
+});
