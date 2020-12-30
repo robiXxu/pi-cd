@@ -24,7 +24,7 @@ app.get("/github-push-webhook", (req, res) => {
 });
 app.post("/github-push-webhook", (req, res) => {
   console.log(
-    `${req.body.pusher.name} updated ${req.body.repository.full_name}`
+    `${req.body.sender.login} updated ${req.body.repository.full_name}`
   );
 
   const projectPath = path.join(basePath, req.body.repository.name);
