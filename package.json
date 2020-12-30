@@ -5,5 +5,9 @@
   "main": "app.js",
   "author": "Schiriac Robert <schiriac.robert@gmail.com>",
   "license": "MIT",
-  "repository": "https://github.com/robiXxu/pi-cd"
+  "repository": "https://github.com/robiXxu/pi-cd",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  }
 }
