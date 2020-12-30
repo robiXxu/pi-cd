@@ -27,7 +27,7 @@ app.post("/github-push-webhook", (req, res) => {
     `${req.body.sender.login} updated ${req.body.repository.full_name}`
   );
 
-  console.log(JSON.stringify(req.body,null,2));
+  console.log(req.body.hook.config.secret);
   if(req.body.hook.config.secret !== webhookSecret) {
     res.sendStatus(401);
     res.end();
@@ -47,8 +47,9 @@ app.post("/github-push-webhook", (req, res) => {
     exec(`git -C ${projectPath} clean -df`, execCallback);
     // pull latest
     exec(`git -C ${projectPath} pull -f`, execCallback);
+    // restart process
+    exec(`pm2 restart ${req.body.repository.name}`, execCallback);
 
-    // pm2 should take care of the rest because watch is enabled.
     res.sendStatus(200);
     res.end();
   });
