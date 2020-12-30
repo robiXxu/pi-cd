@@ -61,7 +61,7 @@ const handlePush = (req, res) => {
         exec(`git -C ${projectPath} clean -df`, (err, stdout, stderr) =>
           execCallback(err, stdout, stderr, () => {
             // pull latest
-            exec(`git -C ${projectPath} pull -f`, (err, stdout, stderr) =>
+            exec(`git -C ${projectPath} pull`, (err, stdout, stderr) =>
               execCallback(err, stdout, stderr, () => {
                 // restart process
                 exec(`pm2 restart ${req.body.repository.name}`, execCallback);
