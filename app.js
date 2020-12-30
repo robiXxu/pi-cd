@@ -11,7 +11,6 @@ const port = 5555;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use();
 
 app.get("/", (req, res) => {
   res.sendStatus(500);
