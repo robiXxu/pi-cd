@@ -4,10 +4,10 @@ const path = require("path");
 const fs = require("fs");
 const app = express();
 const exec = require("child_process").exec;
-const { stderr } = require("process");
-const { Z_FIXED } = require("zlib");
+
 
 const basePath = "/home/pi/root/";
+const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
 const port = 5555;
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -26,6 +26,12 @@ app.post("/github-push-webhook", (req, res) => {
   console.log(
     `${req.body.sender.login} updated ${req.body.repository.full_name}`
   );
+
+  console.log(JSON.stringify(req.body,null,2));
+  if(req.body.hook.config.secret !== webhookSecret) {
+    res.sendStatus(401);
+    res.end();
+  }
 
   const projectPath = path.join(basePath, req.body.repository.name);
   fs.access(projectPath, fs.constants.F_OK, (err) => {
