@@ -1,1 +1,1 @@
-A small server made for continuous deploment on my raspberrypi.
+A small server made for continuous deploment on my RaspberryPI.
