@@ -7,7 +7,7 @@ const exec = require("child_process").exec;
 const { stderr } = require("process");
 const { Z_FIXED } = require("zlib");
 
-const basePath = "~/root/";
+const basePath = "/home/pi/root/";
 const port = 5555;
 
 app.use(bodyParser.urlencoded({ extended: false }));
