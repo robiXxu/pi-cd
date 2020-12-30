@@ -6,9 +6,6 @@ const app = express();
 const exec = require("child_process").exec;
 const crypto = require("crypto");
 
-const basePath = "/home/pi/root/";
-const port = 5555;
-
 const execCallback = (err, stdout, stderr, next) => {
   if (stdout) console.log(stdout);
   if (stderr) console.error(stderr);
@@ -17,7 +14,10 @@ const execCallback = (err, stdout, stderr, next) => {
 };
 
 const createSignature = (body) => {
-  const hmac = crypto.createHmac("sha1", process.env.GITHUB_WEBHOOK_SECRET);
+  const hmac = crypto.createHmac(
+    "sha1",
+    process.env.PICD_GITHUB_WEBHOOK_SECRET
+  );
   const signature = hmac.update(JSON.stringify(body)).digest("hex");
   return `sha1=${signature}`;
 };
@@ -46,7 +46,7 @@ const handlePush = (req, res) => {
     `${req.body.sender.login} updated ${req.body.repository.full_name}`
   );
 
-  const projectPath = path.join(basePath, req.body.repository.name);
+  const projectPath = path.join(process.env.PICD_BASEPATH, req.body.repository.name);
   fs.access(projectPath, fs.constants.F_OK, (err) => {
     if (err) {
       console.error(err);
@@ -92,6 +92,6 @@ app.get("/github-push-webhook", (req, res) => {
 
 app.post("/github-push-webhook", verifySignature, handlePush);
 
-app.listen(port, () => {
-  console.log(`[Pi-CD] listening on ${port}`);
+app.listen(process.env.PICD_PORT, () => {
+  console.log(`[Pi-CD] listening on ${process.env.PICD_PORT}`);
 });
