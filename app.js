@@ -27,9 +27,9 @@ app.post("/github-push-webhook", (req, res) => {
   );
 
   console.log(req.body.hook.config.secret);
-  if(req.body.hook.config.secret !== webhookSecret) {
+  if (req.body.hook.config.secret !== webhookSecret) {
     res.sendStatus(401);
-    res.end();
+    return res.end();
   }
 
   const projectPath = path.join(basePath, req.body.repository.name);
