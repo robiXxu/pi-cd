@@ -32,3 +32,21 @@ PM2           | App name:bot-hunter id:1 online
 0|pi-cd       | [PM2] Applying action restartProcessId on app [bot-hunter](ids: 1)
 0|pi-cd       | [PM2] [bot-hunter](1) ✓
 ```
+
+pm2 config example
+
+```
+module.exports = {
+  apps: [
+    {
+      name: "pi-cd",
+      script: "./pi-cd/app.js",
+      env: {
+        PICD_GITHUB_WEBHOOK_SECRET: "",
+        PICD_PORT: 5555,
+        PICD_BASEPATH: "/home/pi/root",
+      },
+    }
+  ],
+};
+```
