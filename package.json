@@ -1,0 +1,9 @@
+{
+  "name": "pi-cd",
+  "version": "1.0.0",
+  "description": "A mini server that will will update projects on the raspberry pi",
+  "main": "app.js",
+  "author": "Schiriac Robert <schiriac.robert@gmail.com>",
+  "license": "MIT",
+  "repository": "https://github.com/robiXxu/pi-cd"
+}
