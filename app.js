@@ -5,7 +5,6 @@ const fs = require("fs");
 const app = express();
 const exec = require("child_process").exec;
 
-
 const basePath = "/home/pi/root/";
 const webhookSecret = process.env.GITHUB_WEBHOOK_SECRET;
 const port = 5555;
